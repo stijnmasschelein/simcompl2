@@ -5,8 +5,8 @@ Version: 0.1.0
 Author: Stijn Masschelein
 Maintainer: Stijn Masschelein <stijnmasschelein@gmail.com>
 Description: The package automates simulations of data with different levels of
-optimisation and compare tests to detect real effects in the data generating 
-process. 
+    optimisation and compare tests to detect real effects in the data generating 
+    process. 
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
