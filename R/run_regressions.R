@@ -11,6 +11,7 @@ single_reg <- function(data, formula, label = as.character(formula),
   reg <- lm(formula = formula, data = data)
   summ <- summary(reg)
   result <-  data.frame(
+               label = label,
                coefficient = reg$coefficients[variable],
                stat = summ$coefficients[variable, "t value"],
                pvalue = summ$coefficients[variable, "Pr(>|t|)"],
@@ -36,6 +37,7 @@ boot_reg <- function(data, formula, label = as.character(formula),
                          R = bootR)
   boot_ci <- boot::boot.ci(boot.out = boot_out, type = "bca")
   result <- data.frame(
+    label = label,
     coefficient = boot_out$t0,
     sterror = sd(boot_out$t),
     lower_interval = boot_ci$bca[4],
