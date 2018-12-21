@@ -31,7 +31,8 @@ single_reg <- function(data, formula, label = as.character(formula),
 
 boot_reg <- function(data, formula, label = as.character(formula),
                      variable, bootR = 2000){
-  boot_out <- boot::boot(data = data,
+  x <- model.matrix(object = formula, data = data)
+  boot_out <- boot::boot(data = cbind(data$y, x),
                          statistic = boot_helper,
                          formula = formula, variable = variable,
                          R = bootR)
@@ -46,7 +47,8 @@ boot_reg <- function(data, formula, label = as.character(formula),
 }
 
 boot_helper <- function(data, formula, variable, indices){
-  d <- data[indices,]
-  lm <- lm(formula = formula, data = d)
+  x <- data[indices, 2:ncol(data)]
+  y <- data[indices, 1]
+  lm <- lm.fit(x = x, y = y)
   return(coef(lm)[variable])
 }
