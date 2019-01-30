@@ -13,5 +13,6 @@ LazyData: true
 Depends: R (>= 3.5.0)
 Imports: 
     boot,
-    parallel
+    parallel,
+    sandwich
 RoxygenNote: 6.1.1

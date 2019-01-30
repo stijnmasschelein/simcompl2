@@ -20,8 +20,6 @@ run_simulation <- function(data_params, test_params,
                                              boot = FALSE,
                                              bootR = 2000)){
   data_params_grid <- expand.grid(data_params)
-  # result <- apply(data_params_grid, 1, run_1param_simulation,
-                  # test_params = test_params, sim_params = sim_params)
   result <- list()
   n <- nrow(data_params_grid)
   for (i in 1:n){
@@ -51,9 +49,9 @@ run_1_simulation <- function(x, data_params, test_params, sim_params){
   sample <- do.call(simcompl2::create_sample, data_params)
   result <- lapply(test_params, run_1_test,
                   data = sample, sim_params)
-  n <- length(result)
+  n <- sum(sapply(result, nrow))
   df <- cbind(df[rep(1, n), ], do.call(rbind, result))
-  df$id = x
+  df$id <- x
   return(df)
 }
 
