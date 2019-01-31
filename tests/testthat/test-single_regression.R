@@ -32,6 +32,15 @@ test_that("no nan result", {
               nearly_correction = TRUE)
   expect_true(!anyNA(reg))
   expect_true(reg[1, "df"] > reg[2, "df"])
+  expect_true(nrow(reg) > 0)
+  reg = simcompl2::single_reg(data = sample,
+              formula = x1 ~ x2 + z,
+              label = "Performance",
+              variable = "x2",
+              nearly_correction = TRUE)
+  expect_true(!anyNA(reg))
+  expect_true(reg[1, "df"] > reg[2, "df"])
+  expect_true(nrow(reg) > 0)
 })
 
 context("bootstrap")

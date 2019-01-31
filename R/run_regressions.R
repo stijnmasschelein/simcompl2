@@ -36,7 +36,7 @@ single_reg <- function(data, formula, label = as.character(formula),
         se = se,
         df = correction$edf,
         stat = stat,
-        pvalue = 2 * pt(stat, correction$edf,
+        pvalue = 2 * pt(abs(stat), correction$edf,
                         lower.tail = FALSE),
         r2 = summ$r.squared
       )
@@ -83,12 +83,13 @@ nearly_exact <- function(x, w){
   N = nrow(x)
   k = ncol(x) - 1
   c = N / (N - k)
-  xx <- solve(t(x) %*% x)
-  M = diag(rep(1, N)) - x %*% xx %*% t(x)
-  z = t(w) %*% xx %*% t(x)
+  xx <- solve(crossprod(x))
+  M = diag(rep(1, N)) - tcrossprod(x %*% xx, x)
+  z = tcrossprod(t(w) %*% xx, x)
   zz = z %*% t(z)
   mu = c/zz * sum(z^2 * diag(M))
-  nu = 2 * c^2 / zz^2 * (z^2 %*% M^2 %*% t(z^2))
+  z2 = z^2
+  nu = 2 * c^2 / zz^2 * (tcrossprod(z2 %*% M^2, z2))
   edf = 2 * mu^2 / nu
   return(list(mu = as.numeric(mu), edf = as.numeric(edf)))
 }

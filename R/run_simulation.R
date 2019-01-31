@@ -41,6 +41,7 @@ run_1param_simulation <- function(data_params, test_params, sim_params){
                                sim_params = sim_params,
                                mc.cores = sim_params$mc_cores)
   df <- do.call(rbind, result)
+  return(df)
 }
 
 run_1_simulation <- function(x, data_params, test_params, sim_params){
@@ -48,7 +49,10 @@ run_1_simulation <- function(x, data_params, test_params, sim_params){
   data_params <- lapply(data_params, unlist)
   sample <- do.call(simcompl2::create_sample, data_params)
   result <- lapply(test_params, run_1_test,
-                  data = sample, sim_params)
+                   data = sample, sim_params)
+  if (is.null(result)){
+    print("result is null")
+  }
   n <- sum(sapply(result, nrow))
   df <- cbind(df[rep(1, n), ], do.call(rbind, result))
   df$id <- x
@@ -64,4 +68,5 @@ run_1_test <- function(test_params, data, sim_params){
     params$bootR = sim_params$bootR
     result <- do.call(simcompl2::boot_reg, params)
   }
+  return(result)
 }

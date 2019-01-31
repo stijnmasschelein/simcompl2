@@ -6,7 +6,8 @@ test_that("no nan result, is data.frame", {
                      b2 = list(c(0.25, 0, 0), c(0, 0, 0)))
   test_params = list(list(formula = x1 ~ x2 + z,
                           variable = "x2",
-                          label = "demand-control"),
+                          label = "demand-control",
+                          nearly_correction = TRUE),
                      list(formula = x1 ~ x2,
                           variable = "x2",
                           label = "demand-no-control",
@@ -17,6 +18,9 @@ test_that("no nan result, is data.frame", {
                                   sim_params = sim_params)
   expect_true(!anyNA(sim))
   expect_true(class(sim) == "data.frame")
+  expect_true(nrow(sim) > 0)
+  expect_true(all(sim$pvalue <= 1))
+  expect_true(all(sim$pvalue >= 0))
   data_params = list(b2 = list(c(0.25, 0, 0), c(0, 0, 0)),
                      obs = 100)
   test_params = list(list(formula = x1 ~ x2 + z,
@@ -31,4 +35,5 @@ test_that("no nan result, is data.frame", {
                                        sim_params = sim_params)
   expect_true(!anyNA(sim_boot))
   expect_true(class(sim_boot) == "data.frame")
+  expect_true(nrow(sim) > 0)
 })
