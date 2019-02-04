@@ -3,23 +3,33 @@
 #' @param data dataframe for the regression model
 #' @param formula formula for the regression model
 #' @param label character string with the name of the test
-#' @param variable character string with the name of the variable that tests for
+#' @param variable character string with the name of the variable
+#'   that tests for the interdependency
 #' @param nearly_correction boolean for nearly exact correction
-#' according to Young (2016)
-#' the interdependency
+#'   according to Young (2016)
 
-single_reg <- function(data, formula, label = as.character(formula),
+single_reg <- function(data, formula, family = NULL,
+                       label = as.character(formula),
                        variable, nearly_correction = FALSE){
-  reg <- lm(formula = formula, data = data)
+  gaussian = is.null(family)
+  if (gaussian){
+    reg <- lm(formula = formula, data = data)
+    stat <- "t"
+  } else {
+    reg <- glm(formula = formula, data = data, family = family)
+    stat <- "z"
+  }
   summ <- summary(reg)
-  result <-  data.frame(
-               label = label,
-               coefficient = reg$coefficients[variable],
-               se = summ$coefficients[variable, "Std. Error"],
-               df = summ$df[2],
-               stat = summ$coefficients[variable, "t value"],
-               pvalue = summ$coefficients[variable, "Pr(>|t|)"],
-               r2 = summ$r.squared
+    result <-  data.frame(
+                 label = label,
+                 coefficient = reg$coefficients[variable],
+                 se = summ$coefficients[variable, "Std. Error"],
+                 df = summ$df[2],
+                 stat = summ$coefficients[variable,
+                                          paste(stat, "value", sep = " ")],
+                 pvalue = summ$coefficients[variable,
+                                            paste0("Pr(>|", stat, "|)")],
+                 r2 = ifelse(gaussian, summ$r.squared, "")
     )
   if (nearly_correction) {
     x <- model.matrix(object = formula, data = data)

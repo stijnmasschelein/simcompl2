@@ -50,9 +50,6 @@ run_1_simulation <- function(x, data_params, test_params, sim_params){
   sample <- do.call(simcompl2::create_sample, data_params)
   result <- lapply(test_params, run_1_test,
                    data = sample, sim_params)
-  if (is.null(result)){
-    print("result is null")
-  }
   n <- sum(sapply(result, nrow))
   df <- cbind(df[rep(1, n), ], do.call(rbind, result))
   df$id <- x

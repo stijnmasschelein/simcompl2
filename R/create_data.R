@@ -27,14 +27,21 @@ check_numeric <- function(input, len, interval = NULL) {
 #' @param sd The standard deviation of noise term of the performance. A higher
 #'   \code{sd} means that the decisions of interest are less important for
 #'   performance.
-#' @param b The contribution to performance of the two decisions of interest. A
-#'   four element vector for the intercept, \code{x1, x2, x1:x2}
-#' @param d The quadratic effect of the two decisions that captures their the
-#'   diminishing returns.
-#' @param g A vector of two coefficients that indicate the size of the
-#' moderation effect of z on the relation between x and y.
-#' @return A dataset with simulated \code{y} and \code{x1}, \code{x2} for
-#'   surviving observations. The data has dimensions = \code{c(obs, 7)}.
+#' @param b1 The contribution to performance of the three decisions
+#'   of interest. A four element vector for the intercept and the
+#'   three decisions.
+#' @param b2 The contribution to performance of the interactions
+#'   between three decisions of interest.
+#' @param d The quadratic effect of the three decisions that
+#'   captures their the diminishing returns.
+#' @param g1 A vector of three coefficients that indicate the size of the
+#'   moderation effect of z on the relation between x and y.
+#' @param g2 A vector of three coefficients that indicate the size of the
+#'   moderation effect of w on the relation between x and y.
+#' @param xinteger A vector of three booleans indicating which
+#'   elements of x should be integer.
+#' @return A dataset with simulated \code{y} and \code{x},
+#'   \code{z} and \code {w} for surviving observations.
 #' @export
 
 create_sample <-
@@ -47,7 +54,8 @@ create_sample <-
            b2 = c(1, 1, 1),
            d = c(1, 1, 1),
            g1 = c(0, 0, 0),
-           g2 = c(0, 0, 0)
+           g2 = c(0, 0, 0),
+           xinteger = c(FALSE, FALSE, FALSE)
            ){
     check_numeric(obs, 1, c(0, Inf))
     check_numeric(rep, 1, c(0, Inf))
@@ -84,9 +92,12 @@ create_sample <-
       w <- rep(rnorm(1), N) # 'fixed' effects
       for (j in 1:rep){
         z <- rep(rnorm(1), N) # varies for identification
-        x1 <- runif(N, min = -5, max = 5)
-        x2 <- runif(N, min = -5, max = 5)
-        x3 <- runif(N, min = -5, max = 5)
+        x1 <- if(xinteger[1]){sample(c(-1, 1), N, replace = TRUE)}
+          else{runif(N, min = -5, max = 5)}
+        x2 <- if(xinteger[2]){sample(c(-1, 1), N, replace = TRUE)}
+          else{runif(N, min = -5, max = 5)}
+        x3 <- if(xinteger[3]){sample(c(-1, 1), N, replace = TRUE)}
+          else{runif(N, min = -5, max = 5)}
         x_exp  <- cbind(model.matrix( ~ (x1 + x2 + x3) ^ 2), x1 ^ 2,  x2 ^ 2,
                         x3 ^ 2, z * x1, z * x2, z * x3, w * x1, w * x2, w * x3)
         yhat = x_exp %*% c(b1 + eps, b2, -d/2, g1, g2)

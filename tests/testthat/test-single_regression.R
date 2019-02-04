@@ -20,6 +20,27 @@ test_that("no nan result", {
   expect_true(!anyNA(reg))
 })
 
+context("glm")
+
+test_that("logit", {
+  sample = simcompl2::create_sample(xinteger = c(TRUE, FALSE, FALSE))
+  reg = simcompl2::single_reg(data = sample,
+              formula = I(x1 == 1) ~ x2 + z,
+              family = binomial(link = "logit"),
+              label = "logit",
+              variable = "x2")
+  expect_true(!anyNA(reg))
+})
+
+test_that("probit", {
+  sample = simcompl2::create_sample(xinteger = c(TRUE, FALSE, FALSE))
+  reg = simcompl2::single_reg(data = sample,
+              formula = I(x1 == 1) ~ x2 + z,
+              family = binomial(link = "probit"),
+              label = "probit",
+              variable = "x2")
+  expect_true(!anyNA(reg))
+})
 
 context("nearly exact")
 
