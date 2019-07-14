@@ -20,20 +20,21 @@ run_simulation <- function(data_params, test_params,
                                              boot = FALSE,
                                              bootR = 2000)){
   data_params_grid <- expand.grid(data_params)
-  result <- list()
+  tmp_dir <- "tmp_simcompl"
+  if (!dir.exists(tmp_dir)){
+    dir.create(tmp_dir)
+  }
   n <- nrow(data_params_grid)
   for (i in 1:n){
-    result[[i]] <- run_1param_simulation(
+    run_1param_simulation(
       data_params = data_params_grid[i,],
       test_params = test_params,
-      sim_params = sim_params)
+      sim_params = sim_params,
+      tmp_dir = tmp_dir)
   }
-  df <- do.call(rbind, result)
-  rownames(df) <- NULL
-  return(df)
 }
 
-run_1param_simulation <- function(data_params, test_params, sim_params){
+run_1param_simulation <- function(data_params, test_params, sim_params, tmp_dir){
   result <- parallel::mclapply(1:sim_params$nsim,
                                run_1_simulation,
                                data_params = data_params,
@@ -41,7 +42,9 @@ run_1param_simulation <- function(data_params, test_params, sim_params){
                                sim_params = sim_params,
                                mc.cores = sim_params$mc_cores)
   df <- do.call(rbind, result)
-  return(df)
+  name <- paste("simulation-", format(Sys.time(), "%a-%b-%d-%H-%M-%S-%Y"),
+                ".RDS", sep="")
+  saveRDS(df, file = file.path(tmp_dir, name))
 }
 
 run_1_simulation <- function(x, data_params, test_params, sim_params){
