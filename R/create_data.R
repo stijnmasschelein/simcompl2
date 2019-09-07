@@ -125,3 +125,17 @@ create_sample <-
     names(dt) <- c("y", "x1", "x2", "x3", "z", "w", "id")
     return(dt)
   }
+
+#' Create a sample of mixed parameters.
+#' @params1 list of named parameters for the first type of observations
+#' @params2 list of named parameters for the seond type of observations
+#' @return A dataset with simulated \code{y} and \code{x},
+#'   \code{z} and \code {w} for surviving observations.
+#' @export
+
+create_mixed_sample <- function(params1, params2){
+  s1 <- do.call(create_sample, params1)
+  s2 <- do.call(create_sample, params2)
+  dt <- rbind(s1, s2)
+  return(dt)
+}

@@ -28,3 +28,13 @@ test_that("Test some of the contingency parameters", {
   pval = pnorm(mean(yhat), 0, params$sd / sqrt(observations))
   expect_true(any(pval > 0.001, pval < 0.999))
 })
+
+context("mixed data")
+
+test_that("No nans in dataset, all variables included", {
+  params1 = list(obs = 100)
+  params2 = list(obs = 200)
+  sample = create_mixed_sample(params1, params2)
+  expect_true(!anyNA(sample))
+  expect_equal(ncol(sample), 7)
+})

@@ -7,7 +7,7 @@
 #' \describe{
 #' \item{\code{nsim}}{Integer for the number of replications in the
 #' simulation}
-#' \item{\code{mc_cores}}{Integer for the number of cores to be used in the
+#' \item{\code{mc_cores}}{Integer for the number of cores to be used in
 #'  parallel}
 #' \item{\code{boot}}{Boolean whether the bootstrap version is used
 #' to estimate standard errors.}
@@ -49,8 +49,18 @@ run_1param_simulation <- function(data_params, test_params, sim_params, tmp_dir)
 
 run_1_simulation <- function(x, data_params, test_params, sim_params){
   df <- data_params
-  data_params <- lapply(data_params, unlist)
-  sample <- do.call(simcompl2::create_sample, data_params)
+  dp <- unlist(data_params, recursive = FALSE)
+  nr_obs <- length(dp$obs)
+  if (nr_obs <= 1){
+    sample <- do.call(simcompl2::create_sample, dp)
+  } else if (nr_obs == 2){
+    params = list(params1 = lapply(dp, function(l) l[[1]]),
+                  params2 = lapply(dp, function(l) l[[2]]))
+    sample <- do.call(simcompl2::create_mixed_sample, params)
+  } else {
+    stop(paste("There are", nr_obs,
+               "obs values in the parameters"))
+  }
   result <- lapply(test_params, run_1_test,
                    data = sample, sim_params)
   n <- sum(sapply(result, nrow))
