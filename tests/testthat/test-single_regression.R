@@ -75,3 +75,13 @@ test_that("no nan result", {
                  bootR = 500)
   expect_true(!anyNA(reg))
 })
+
+context("contingency on complementarity")
+test_that("parameter h2 estimated", {
+  sample = simcompl2::create_sample(h1 = c(.5, 0, 0))
+  reg = single_reg(data = sample,
+                         formula = x1 ~ x2 * z,
+                         label = "contingency",
+                         variable = "x2:z")
+  expect_true(!anyNA(reg))
+})

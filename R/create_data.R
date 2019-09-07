@@ -33,11 +33,13 @@ check_numeric <- function(input, len, interval = NULL) {
 #' @param b2 The contribution to performance of the interactions
 #'   between three decisions of interest.
 #' @param d The quadratic effect of the three decisions that
-#'   captures their the diminishing returns.
+#'   captures their diminishing returns.
 #' @param g1 A vector of three coefficients that indicate the size of the
 #'   moderation effect of z on the relation between x and y.
 #' @param g2 A vector of three coefficients that indicate the size of the
 #'   moderation effect of w on the relation between x and y.
+#' @param h1 A vector of three coefficients that indicate the size of the
+#'   moderation effect of z on the interactions between x and y.
 #' @param xinteger A vector of three booleans indicating which
 #'   elements of x should be integer.
 #' @return A dataset with simulated \code{y} and \code{x},
@@ -55,6 +57,7 @@ create_sample <-
            d = c(1, 1, 1),
            g1 = c(0, 0, 0),
            g2 = c(0, 0, 0),
+           h1 = c(0, 0, 0),
            xinteger = c(FALSE, FALSE, FALSE)
            ){
     check_numeric(obs, 1, c(0, Inf))
@@ -67,6 +70,7 @@ create_sample <-
     check_numeric(d, 3, c(0, Inf))
     check_numeric(g1, 3)
     check_numeric(g2, 3)
+    check_numeric(h1, 3)
 
     # set Nfunction
     freq <- 1/rate
@@ -98,9 +102,12 @@ create_sample <-
           else{runif(N, min = -5, max = 5)}
         x3 <- if(xinteger[3]){sample(c(-1, 1), N, replace = TRUE)}
           else{runif(N, min = -5, max = 5)}
-        x_exp  <- cbind(model.matrix( ~ (x1 + x2 + x3) ^ 2), x1 ^ 2,  x2 ^ 2,
-                        x3 ^ 2, z * x1, z * x2, z * x3, w * x1, w * x2, w * x3)
-        yhat = x_exp %*% c(b1 + eps, b2, -d/2, g1, g2)
+        x_exp  <- cbind(model.matrix( ~ (x1 + x2 + x3) ^ 2),
+                        x1 ^ 2,  x2 ^ 2, x3 ^ 2,
+                        z * x1, z * x2, z * x3,
+                        w * x1, w * x2, w * x3,
+                        z * x1 * x2, z * x1 * x3, z * x2 * x3)
+        yhat = x_exp %*% c(b1 + eps, b2, -d/2, g1, g2, h1)
         y = rnorm(length(yhat), yhat, sd)
         # stupid selection mechanism
         # can probably be improvemed by working with a probabilitstic model.
